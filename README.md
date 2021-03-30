@@ -23,8 +23,9 @@ This is a work in progress, and there are a few things that still need done:
 - More stylish ui for the web app 
 
 ## Installation and Testing
-Just clone the repo, and use "npm run dev" to start the server.
+The reddit api requires OAUTH2, so you must make a reddit account and [regiser an application](https://docs.google.com/forms/d/e/1FAIpQLSezNdDNK1-P8mspSbmtC2r86Ee9ZRbC66u929cG2GX0T9UMyw/viewform) for the app to work. Save your details in a file named "secret.json"
 
+Just clone the repo, and use "npm run dev" to start the server.
 I use browser-sync to serve my html file to myself on localhost, although any local static file server will do.
 
 
