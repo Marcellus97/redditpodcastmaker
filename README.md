@@ -1,2 +1,2 @@
-# redditpodcastmaker
-make an mp3 podcast from reddit posts
+# redditcast
+makes an mp3 podcast out of reddit posts

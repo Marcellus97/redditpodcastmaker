@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>redditcast</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+
+        <style>
+            body {
+                text-align: center;
+            }            
+
+
+            label {
+                font-size: large;
+            }
+        </style>
+
+        <h1>Redditcast</h1>
+        <label for="search">Search for a subreddit</label>
+        <input id="search" type="search" required="true">
+        <hr>
+
+        <label for="subreddits">Select a subreddit</label>
+        <select id="subreddits" required="true"></select>
+        <hr>
+
+
+        <label>Select desired post sort</label>
+        <br>
+        <label for="topRadio">Top</label>
+        <input id="topRadio" type="radio" required="true"></input>
+        <label for="hotRadio">Hot</label>
+        <input id="hotRadio" type="radio" required="true"></input>
+        <br>
+
+        <!-- This might need to be a grid -->
+        <label for="posts">Select desired posts</label>
+        <select id="posts" required="true"></select>
+        <br>
+
+        <label for="comments">Select amount of desired comments per post</label>
+        <input id="comments" type="number" min="0" max="100" step="1" required="true">
+        <hr>
+
+        <label for="languages">Select desired speaker accent</label>
+        <select id="languages" required="true"></select>
+        <br>
+        <label for="podcastName">Enter name of podcast EX: "Horror stories mix"</label>
+        <input id="podcastName" type="text" maxlength="100" required="true">
+        <br>
+        <button id="generate">Generate</button>
+
+    
+        <script async defer>
+            const endpoint = 'localhost:4000/';
+
+
+            // Api calls
+            function generateMp3() {
+                try{
+                    
+                } catch (error) {
+                    alert(`Something went wrong with the mp3...\n${error}`)
+                }
+
+            }
+
+            function  searchForSubreddits() {
+
+                try{
+                    
+                } catch (error) {
+                    alert(`Something went wrong with the subreddit search...\n${error}`)
+                }
+            }
+
+            function getHotPosts() {
+
+                try{
+                    
+                } catch (error) {
+                    alert(`Something went wrong with the hot post search...\n${error}`)
+                }
+            }
+
+            function getTopPosts() {
+
+                try{
+                    
+                } catch (error) {
+                    alert(`Something went wrong with the top post search...\n${error}`)
+                }
+            }
+
+            function language() {
+                try {
+
+                } catch (error) {
+                    alert(`Something went wrong with the languages...\n${error}`)
+                }
+            }
+
+        </script>
+
+    </body>
+</html>
