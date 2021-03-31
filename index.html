@@ -26,34 +26,60 @@
             select {
                 width: 200px;
             }
+            #selectedPosts {
+                background-color: #eee;
+                margin:auto;
+                width: 400px;
+                height: 200px;
+                overflow-y:scroll;
+            }
+
         </style>
 
         <h1>Redditcast</h1>
         <label for="search">Search for a subreddit</label>
-        <input id="search" type="search" required="true">
-        <button id="searchButton">Search</button>
+        <input id="search" type="search" >
+        <button type="button" id="searchButton">Search</button>
         <hr>
 
         <label for="subreddits">Select a subreddit</label>
-        <select id="subreddits" required="true"></select>
+        <select id="subreddits"></select>
         <hr>
 
 
         <label>Select desired post sort</label>
         <br>
         <label for="topRadio">Top</label>
-        <input id="topRadio" type="radio" required="true"></input>
+        <input id="topRadio" type="radio" name="sort" value="top" checked="true"></input>
         <label for="hotRadio">Hot</label>
-        <input id="hotRadio" type="radio" required="true"></input>
+        <input id="hotRadio" type="radio" name="sort" value="top"></input>
+
+        <br>
+        <select>
+            <option value="hour">Hour</option>
+            <option value="day">Day</option>
+            <option value="week">Week</option>
+            <option value="month">Month</option>
+            <option value="allr">All</option>
+        </select>
         <br>
 
         <!-- This might need to be a grid -->
         <label for="posts">Select desired posts</label>
         <select id="posts" required="true"></select>
+        <button type="button">Add Post</button>
         <br>
 
         <label for="comments">Select amount of desired comments per post</label>
-        <input id="comments" type="number" min="0" max="100" step="1" required="true">
+        <input id="comments" type="number" min="0" max="100" step="1" required="true" >
+        <hr>
+
+        <div id="selectedPosts">
+            <h4>Selected - Comments</h4>
+            <p>sadfasf - 20</p>
+            <p>sadfasf</p>
+            <p>sadfasf</p>
+        </div>
         <hr>
 
         <label for="languages">Select desired speaker accent</label>
@@ -62,23 +88,39 @@
         <label for="podcastName">Enter name of podcast EX: "Horror stories mix"</label>
         <input id="podcastName" type="text" maxlength="100" required="true">
         <br>
-        <button id="generate">Generate</button>
+        <button type="button" id="generate">Generate</button>
 
     
         <script async defer>
             const endpoint = 'http://localhost:4000/';
             
             // event assigntments
-            document.getElementById('searchButton').onclick= searchForSubreddits;
-            document.getElementById('subreddits').onselect = searchForPosts
+            document.getElementById('searchButton').onclick = searchForSubreddits;
+            document.getElementById('subreddits').onchange = searchForPosts
 
-            // my helpers
-            const data = getLanguages();
+            // init
+            getLanguages();
 
-            function searchForPosts() {
+            function searchForPosts(sender) {
+                console.log(sender);
                 //check for top or hot
+                const sort = document.querySelector('input[name="sort"]:checked').value
+                const subreddit = sender.target.value;
+
+                console.log(endpoint + sort + '/' + subreddit);
+                // could be top or hot
+                fetch(endpoint + sort + '/' + subreddit)
+                .then(response => response.json())
+                .then(data => {
+                    let postslist = document.getElementById('posts');
+                    data.s
+                })
+                .catch(error => {
+                    alert(`Something went wrong with the ${sort} post search...\n${error}`)
+                })
             }
 
+            //init
             // Api calls
             function generateMp3() {
                 try{
@@ -94,16 +136,17 @@
                 fetch(endpoint + 'searchforsubreddits?q=' + text)
                 .then(response => response.json())
                 .then(data => {
+                    // this data returns a subreddit id, but we may not use it
                     let subredditsList = document.getElementById('subreddits');
-                    subredditsList.innerHTML = "";
+                    subredditsList.innerHTML = ""; // clear current options in the select
                     data.subreddits.forEach(sub => {
-                        console.log(sub);
                         const el = document.createElement("option");
                         el.textContent = sub.displayName + ' - ' + sub.title; // matches language with prefix
-                        el.value = sub.id;
+                        el.value = sub.displayName.substring(2); // remove the 'r/' from subreddit name for api used
                         subredditsList.appendChild(el);
                     });
-                    console.log(data)
+                    // manually call onchange method
+                    subredditsList.dispatchEvent(new Event("change"));
                })
                 .catch(function(error) {
                     alert(`Something went wrong with the subreddit search...\n${error}`)
