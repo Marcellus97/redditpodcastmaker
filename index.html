@@ -22,11 +22,16 @@
             label {
                 font-size: large;
             }
+
+            select {
+                width: 200px;
+            }
         </style>
 
         <h1>Redditcast</h1>
         <label for="search">Search for a subreddit</label>
         <input id="search" type="search" required="true">
+        <button id="searchButton">Search</button>
         <hr>
 
         <label for="subreddits">Select a subreddit</label>
@@ -61,8 +66,18 @@
 
     
         <script async defer>
-            const endpoint = 'localhost:4000/';
+            const endpoint = 'http://localhost:4000/';
+            
+            // event assigntments
+            document.getElementById('searchButton').onclick= searchForSubreddits;
+            document.getElementById('subreddits').onselect = searchForPosts
 
+            // my helpers
+            const data = getLanguages();
+
+            function searchForPosts() {
+                //check for top or hot
+            }
 
             // Api calls
             function generateMp3() {
@@ -74,13 +89,25 @@
 
             }
 
-            function  searchForSubreddits() {
-
-                try{
-                    
-                } catch (error) {
+            function  searchForSubreddits(sender) {
+                const text = document.getElementById('search').value;
+                fetch(endpoint + 'searchforsubreddits?q=' + text)
+                .then(response => response.json())
+                .then(data => {
+                    let subredditsList = document.getElementById('subreddits');
+                    subredditsList.innerHTML = "";
+                    data.subreddits.forEach(sub => {
+                        console.log(sub);
+                        const el = document.createElement("option");
+                        el.textContent = sub.displayName + ' - ' + sub.title; // matches language with prefix
+                        el.value = sub.id;
+                        subredditsList.appendChild(el);
+                    });
+                    console.log(data)
+               })
+                .catch(function(error) {
                     alert(`Something went wrong with the subreddit search...\n${error}`)
-                }
+                });
             }
 
             function getHotPosts() {
@@ -101,12 +128,21 @@
                 }
             }
 
-            function language() {
-                try {
-
-                } catch (error) {
+            function getLanguages() {
+               fetch(endpoint + 'languages')
+                .then(response => response.json())
+                .then(data => {
+                    let select = document.getElementById('languages');
+                    for (const [prefix, fullLang] of Object.entries(data)) {
+                        const el = document.createElement("option");
+                        el.textContent = fullLang; // matches language with prefix
+                        el.value = prefix;
+                        select.appendChild(el);
+                    }
+                })
+                .catch(function (error) {
                     alert(`Something went wrong with the languages...\n${error}`)
-                }
+                });
             }
 
         </script>

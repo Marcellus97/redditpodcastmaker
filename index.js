@@ -1,18 +1,19 @@
 const express = require('express');
+const cors = require('cors')
 const path = require('path')
 const fs = require('fs');
-const app = express();
 
 // local imports
 const reddit = require('./reddit')
 const tts = require('./tts')
 const swagger = require('./swagger');
 
+const app = express();
+app.use(cors());
 app.use(express.json());
-app.listen(4000);
-
-
+// swagger
 app.use('/docs', swagger.serve, swagger.setup(swagger.specs));
+app.listen(4000);
 
 
 // Might be better suited as a post method, but we delete all trace of user data afterwards anyway... 
@@ -73,14 +74,24 @@ app.post("/generateMp3", function(request, response, next) {
  *                  description: reddit api rate limiting. Wait a minute...
  */
 app.get('/searchforsubreddits', async (request, response, next) => {
-    console.log(response.body);
     const search = {
-        q : request.body.q,
-        limit : request.body.limit
+        q : request.query.q,
+        limit : 25
     };
-    data = await reddit.getSearchForSubs(search);
-    response.send(data.body);
-    console.log(request.ip);
+    const data = await reddit.getSearchForSubs(search);
+    const children = data.body.data.children;
+    let subreddits = [];
+    children.forEach(element => subreddits.push({
+        id: element.data.name,
+        title: element.data.title,
+        displayName: element.data.display_name_prefixed 
+    }));
+
+    //response.send(data);
+    response.send({subreddits: subreddits});
+
+    const headers = reddit.getRateLimit(data.headers);
+    console.log(headers.remaining);
 });
 
 /**
@@ -100,6 +111,8 @@ app.get('/hot/:subreddit', async (request, response, next) => {
     const subreddit = request.params.subreddit;
     const data = await reddit.getHot(subreddit);
     response.send(data.body);
+    const headers = reddit.getRateLimit(data.headers);
+    console.log(headers.remaining)
 });
 
 /**
@@ -119,6 +132,8 @@ app.get('/top/:subreddit', async (request, response, next) => {
     const subreddit = request.params.subreddit;
     data = await reddit.getTop(subreddit);
     response.send(data.body);
+    const headers = reddit.getRateLimit(data.headers);
+    console.log(headers.remaining)
 });
 
 
@@ -141,6 +156,8 @@ app.get('/ids/:names', async (request, response, next) => {
     data = await reddit.getById(names);
     console.log(reddit.getRateLimit(data.headers))
     response.send(data.body);
+    const headers = reddit.getRateLimit(data.headers);
+    console.log(headers.remaining)
 });
 
 /**
