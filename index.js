@@ -110,6 +110,14 @@ app.get('/searchforsubreddits', async (request, response, next) => {
 app.get('/hot/:subreddit', async (request, response, next) => {
     const subreddit = request.params.subreddit;
     const data = await reddit.getHot(subreddit);
+    
+    const children = data.body.data.children;
+    let posts = [];
+    children.forEach(element => subreddits.push({
+        id: element.data.name,
+        title: element.data.title,
+        displayName: element.data.display_name_prefixed 
+    }));
     response.send(data.body);
     const headers = reddit.getRateLimit(data.headers);
     console.log(headers.remaining)
