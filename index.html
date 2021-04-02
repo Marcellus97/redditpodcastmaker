@@ -52,7 +52,7 @@
         <label for="topRadio">Top</label>
         <input id="topRadio" type="radio" name="sort" value="top" checked="true"></input>
         <label for="hotRadio">Hot</label>
-        <input id="hotRadio" type="radio" name="sort" value="top"></input>
+        <input id="hotRadio" type="radio" name="sort" value="hot"></input>
 
         <br>
         <!--
@@ -100,34 +100,60 @@
             document.getElementById('searchButton').onclick = searchForSubreddits;
             document.getElementById('subreddits').onchange = searchForPosts;
             document.getElementById('addPostButton').onclick = addPost;
-            document.getElementById('generate').onclick = generateMP3;
+            document.getElementById('generate').onclick = generateMp3;
+            document.getElementById('topRadio').onclick = changeSort;
+            document.getElementById('hotRadio').onclick = changeSort;
 
             // init
             getLanguages();
 
-            function addPost() {
-                let post = document.getElementById('posts');
-                let selectedPosts = document.getElementById('selectedPosts');
-                let el = document.createElement('p');
-                el.textContent = post.textContent;
-                selectedPosts.appendChild(el);
+            function changeSort(sender) {
+                // as if we changed the subreddit list (we did because of new sort)
+                let subredditsList = document.getElementById('subreddits');
+                subredditsList.dispatchEvent(new Event("change"));
+            }
 
-                globalPosts.push({id: post.value, title: post.textContent});
+            function addPost() {
+                let posts = document.getElementById('posts');
+                let selectedPosts = document.getElementById('selectedPosts');
+                if (posts.children.length > 0) {
+                    const post = posts.selectedOptions[0];
+                    let duplicate = false;
+
+                    globalPosts.forEach(p => {
+                        if (p.id == post.value);
+                            duplicate = true;
+                    })
+
+                    if (duplicate) {
+                        alert(`Post "${post.textContent}" was already added`);
+                        return;
+                    }
+
+                    let el = document.createElement('p');
+                    el.textContent = post.textContent;
+                    selectedPosts.appendChild(el);
+                    globalPosts.push({id: post.value, title: post.textContent});
+                }
             }
 
             function searchForPosts(sender) {
-                console.log(sender);
                 //check for top or hot
                 const sort = document.querySelector('input[name="sort"]:checked').value
                 const subreddit = sender.target.value;
 
-                console.log(endpoint + sort + '/' + subreddit);
                 // could be top or hot
                 fetch(endpoint + sort + '/' + subreddit)
                 .then(response => response.json())
                 .then(data => {
                     let postslist = document.getElementById('posts');
-                    data.s
+                    postslist.innerHTML = "";
+                    data.posts.forEach(post => {
+                        const el = document.createElement("option");
+                        el.textContent = post.title; // matches language with prefix
+                        el.value = post.id;
+                        postslist.appendChild(el);
+                    });
                 })
                 .catch(error => {
                     alert(`Something went wrong with the ${sort} post search...\n${error}`)
@@ -160,7 +186,9 @@
                         subredditsList.appendChild(el);
                     });
                     // manually call onchange method
-                    subredditsList.dispatchEvent(new Event("change"));
+                    if (data.subreddits.length > 0)
+                        subredditsList.dispatchEvent(new Event("change"));
+                    else alert(`No results for subreddit "${text}"`);
                })
                 .catch(function(error) {
                     alert(`Something went wrong with the subreddit search...\n${error}`)

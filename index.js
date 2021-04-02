@@ -113,12 +113,11 @@ app.get('/hot/:subreddit', async (request, response, next) => {
     
     const children = data.body.data.children;
     let posts = [];
-    children.forEach(element => subreddits.push({
+    children.forEach(element => posts.push({
         id: element.data.name,
         title: element.data.title,
-        displayName: element.data.display_name_prefixed 
     }));
-    response.send(data.body);
+    response.send({posts: posts});
     const headers = reddit.getRateLimit(data.headers);
     console.log(headers.remaining)
 });
@@ -138,8 +137,15 @@ app.get('/hot/:subreddit', async (request, response, next) => {
  */
 app.get('/top/:subreddit', async (request, response, next) => {
     const subreddit = request.params.subreddit;
-    data = await reddit.getTop(subreddit);
-    response.send(data.body);
+    const data = await reddit.getTop(subreddit);
+
+    const children = data.body.data.children;
+    let posts = [];
+    children.forEach(element => posts.push({
+        id: element.data.name,
+        title: element.data.title,
+    }));
+    response.send({posts: posts});
     const headers = reddit.getRateLimit(data.headers);
     console.log(headers.remaining)
 });
