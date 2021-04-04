@@ -42,10 +42,12 @@ app.post("/generateMp3", function(request, response, next) {
 
     //TODO
     //Need to store and parse these posts somehow
+    //By parse, i mean get post text and comments, and stick them in one object
+    // {posts : [{title, selftext, comments:[] }, ...] }
     const params = request.body;
     const posts = getIds(params.fullNames);
     console.log(posts);
-    //reddit.parsePosts();
+    //const parsedPosts = reddit.parsePosts();
     
     // use ip for filename just incase of naming conflicts. strip periods
     const filename = params.filename.replace('.', '') + '.mp3';
