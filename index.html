@@ -121,11 +121,13 @@
                     let duplicate = false;
 
                     globalPosts.forEach(p => {
-                        if (p.id == post.value);
+                        if (p.id == post.value) {
                             duplicate = true;
-                    })
+                            return;
+                        }
+                    });
 
-                    if (duplicate) {
+                    if (duplicate == true) {
                         alert(`Post "${post.textContent}" was already added`);
                         return;
                     }

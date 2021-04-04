@@ -43,6 +43,12 @@ function getRateLimit(headers) {
     }
 }
 
+function parsePosts() {
+    const result = {posts: null};
+    return {};
+}
+
+exports.parsePosts = parsePosts;
 exports.getHot = getHot;
 exports.getTop = getTop;
 exports.getSearchForSubs = getSearchForSubs;

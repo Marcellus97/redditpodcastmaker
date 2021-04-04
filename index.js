@@ -39,9 +39,13 @@ app.post("/generateMp3", function(request, response, next) {
         language:'',
     } = request.body;
     */
-   
+
+    //TODO
+    //Need to store and parse these posts somehow
     const params = request.body;
-    console.log(params)
+    const posts = getIds(params.fullNames);
+    console.log(posts);
+    //reddit.parsePosts();
     
     // use ip for filename just incase of naming conflicts. strip periods
     const filename = params.filename.replace('.', '') + '.mp3';
@@ -174,6 +178,9 @@ app.get('/ids/:names', async (request, response, next) => {
     console.log(headers.remaining)
 });
 
+async function getIds(request, response, next) {
+
+}
 /**
  * @swagger
  * /languages:
