@@ -87,7 +87,7 @@
         <select id="languages" required="true"></select>
         <br>
         <label for="podcastName">Enter name of podcast EX: "Horror stories mix"</label>
-        <input id="podcastName" type="text" maxlength="100" required="true" value="filename">
+        <input id="podcastName" type="text" maxlength="100" required="true" value="MyRedditPodcast">
         <br>
         <button type="button" id="generate">Generate</button>
 
@@ -165,11 +165,38 @@
             //init
             // Api calls
             function generateMp3() {
-                try{
-                    
-                } catch (error) {
-                    alert(`Something went wrong with the mp3...\n${error}`)
+ 
+                // prevent trying to generate with 0 posts
+                if (globalPosts.length < 1) {
+                    alert('No posts have been added!');
+                    return;
                 }
+                
+                // populating body. filename language and posts.
+                let language = document.getElementById('languages').value;
+                let podcastName = document.getElementById('podcastName').value;
+                let body = {
+                    language: language,
+                    podcastName: podcastName,
+                    fullNames: globalPosts.map( post => post.id)
+                };
+
+                console.log(body);
+                fetch(endpoint + 'generateMp3', {
+                    method: 'POST',
+                    body: JSON.stringify(body),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    } 
+                })
+                .then(response => response)
+                .then(data => {
+                    //probably check if the data we sent was okay here
+                    console.log(data);
+                })
+                .catch (error => {
+                    alert(`Something went wrong with the mp3...\n${error}`)
+                });
 
             }
 

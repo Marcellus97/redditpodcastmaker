@@ -31,7 +31,8 @@ async function getSearchForSubs(params) {
 }
 
 async function getById(names) {
-    return reddit.get(`/by_id/${names}`);
+    let namesString = names.join();
+    return reddit.get(`/by_id/${namesString}`);
 }
 
 // use this after getting a response from the reddit api

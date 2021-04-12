@@ -33,9 +33,8 @@ app.listen(4000);
 app.post("/generateMp3", function(request, response, next) {
     /*
     const {
-        filename : 
+        podcastName : 
         fullNames : [],
-        commentLimit: 0,
         language:'',
     } = request.body;
     */
@@ -45,25 +44,34 @@ app.post("/generateMp3", function(request, response, next) {
     //By parse, i mean get post text and comments, and stick them in one object
     // {posts : [{title, selftext, comments:[] }, ...] }
     const params = request.body;
-    const posts = getIds(params.fullNames);
-    console.log(posts);
+    console.log(params);
+    const posts = reddit.getById(params.fullNames);
+    console.log(params.fullNames);
+    posts.then(data => {
+        let fullPosts = data.body.data.children;
+        console.log(fullPosts);
+    });
     //const parsedPosts = reddit.parsePosts();
     
     // use ip for filename just incase of naming conflicts. strip periods
-    const filename = params.filename.replace('.', '') + '.mp3';
+    const podcastName = params.podcastName.replace('.', '') + '.mp3';
 
     // use helper method to unpack json object of reddit posts to stringify it
     const speech = 'this is just test text';
     // const speech = stringifyRedditPosts();
-    tts.generateMp3(filename, speech);
+    tts.generateMp3(podcastName, speech);
 
-    var filePath = path.join(__dirname, filename);
+    var filePath = path.join(__dirname, podcastName);
     response.download(filePath, function(err) {
        // delete file here once the file is done
-       fs.unlink(filePath, ()=> {
+
+       /*
+        fs.unlink(filePath, ()=> {
            console.log(`deleting ${filePath}`);
         });
+        */
     }); 
+    response.send('done');
 });
 
 /**
