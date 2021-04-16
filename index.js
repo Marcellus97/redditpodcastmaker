@@ -16,6 +16,18 @@ app.use('/docs', swagger.serve, swagger.setup(swagger.specs));
 app.listen(4000);
 
 
+/**
+ * @swagger
+ * /downdloadMp3:
+ *      get:
+ *          description: downloads generated mp3 file
+ */
+app.get("/downloadMp3", async (request, response, next) => {
+    const podcastName = request.query.podcastName;
+    const filePath = path.join(__dirname, podcastName);
+    response.download(filePath, podcastName);
+});
+
 // Might be better suited as a post method, but we delete all trace of user data afterwards anyway... 
 /**
  * @swagger
@@ -30,48 +42,32 @@ app.listen(4000);
  *              503:
  *                  description: reddit api rate limiting. Wait a minute...
  */
-app.post("/generateMp3", function(request, response, next) {
-    /*
-    const {
-        podcastName : 
-        fullNames : [],
-        language:'',
-    } = request.body;
-    */
-
-    //TODO
-    //Need to store and parse these posts somehow
-    //By parse, i mean get post text and comments, and stick them in one object
-    // {posts : [{title, selftext, comments:[] }, ...] }
+app.post("/generateMp3", async (request, response, next) => {
     const params = request.body;
-    console.log(params);
-    const posts = reddit.getById(params.fullNames);
-    console.log(params.fullNames);
-    posts.then(data => {
-        let fullPosts = data.body.data.children;
-        console.log(fullPosts);
-    });
-    //const parsedPosts = reddit.parsePosts();
-    
+    const posts = await reddit.getById(params.fullNames);
+    const fullPosts = posts.body.data.children;
+    let parsedData = [];
+    //{title:'', subreddit: '', id:'', selftext: '', comments:['a','b',...]}
+
+    for (let tempPost of fullPosts) {
+        const {title, selftext, subreddit, id} = tempPost.data;
+
+        const comments = await reddit.getComments(subreddit, id);
+        //nor sure why, this returns two objects, and the first is the subreddit data, second is comments
+        const commentList = comments.body[1].data.children.map(com => 'Comment: ' + com.data.body);
+        console.log(commentList);
+        parsedData.push({title:title,selftext:selftext,subreddit:subreddit,id:id, comments:commentList});
+    }                
     // use ip for filename just incase of naming conflicts. strip periods
     const podcastName = params.podcastName.replace('.', '') + '.mp3';
 
     // use helper method to unpack json object of reddit posts to stringify it
-    const speech = 'this is just test text';
-    // const speech = stringifyRedditPosts();
+    const speech = stringifyRedditPosts(parsedData);
+    console.log(speech);
     tts.generateMp3(podcastName, speech);
 
-    var filePath = path.join(__dirname, podcastName);
-    response.download(filePath, function(err) {
-       // delete file here once the file is done
 
-       /*
-        fs.unlink(filePath, ()=> {
-           console.log(`deleting ${filePath}`);
-        });
-        */
-    }); 
-    response.send('done');
+    response.send(JSON.stringify({podcastName:podcastName}));
 });
 
 /**
@@ -206,3 +202,14 @@ app.get('/languages', async (request, response, next) => {
     const langs = await tts.getLanguages();
     response.send(langs);
 });
+
+
+function stringifyRedditPosts(parsedData) {
+    let redditString = 'Welcome to your reddit podcast...';
+
+    for (let post of parsedData) {
+        redditString = redditString.concat(`subreddit: ${post.subreddit}. post: ${post.selftext}. comments: ${post.comments.toString()}. Thats all for this post.`);
+    }
+
+    return redditString;
+}

@@ -25,6 +25,9 @@ async function getTop(subreddit, params) {
     return reddit.get(`/r/${subreddit}/top`, params);
 }
  
+async function getComments(subreddit, id) {
+    return reddit.get(`/r/${subreddit}/comments/${id}`);
+}
 
 async function getSearchForSubs(params) {
     return reddit.get(`/subreddits/search`, params);
@@ -51,6 +54,7 @@ function parsePosts() {
 
 exports.parsePosts = parsePosts;
 exports.getHot = getHot;
+exports.getComments = getComments;
 exports.getTop = getTop;
 exports.getSearchForSubs = getSearchForSubs;
 exports.getById = getById;
